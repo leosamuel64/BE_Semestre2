@@ -38,15 +38,15 @@
                 <div class="row g-4">
                     <div class="col-sm-12 col-xl-6">
                         <div class="bg-light rounded h-100 p-4">
-                            <h6 class="mb-4">Connexion</h6>
-                            <form action="/verif_login" method="POST">
+                            <h6 class="mb-4">Changer le mot de passe</h6>
+                            <form action="/newMdp" method="POST">
                                 <div class="mb-3">
-                                    <label for="login" class="form-label">Identifiant</label>
-                                    <input name="login" id="login" type="text" class="form-control" placeholder="Login">
+                                    <label for="mdp1" class="form-label">Mot de Passe</label>
+                                    <input name="mdp1" id="mdp1" type="password" class="form-control" placeholder="Nouveau mot de passe">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="mdp" class="form-label">Mot de Passe</label>
-                                    <input name="mdp" id="mdp" type="password" class="form-control" placeholder="Password">
+                                    <label for="mdp2" class="form-label">Mot de Passe</label>
+                                    <input name="mdp2" id="mdp2" type="password" class="form-control" placeholder="Confirmation du mot de passe">
                                 </div>
                                 
                                 <button type="submit" class="btn btn-primary">Se connecter</button>

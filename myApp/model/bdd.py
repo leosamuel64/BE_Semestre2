@@ -55,3 +55,24 @@ def SuppMembreBdd(idUser):
     connection.execute(request)
     connection.commit()
     connection.close()
+
+def add_membreData(nom,prenom,mail,login,motPasse,statut,newmdp=1):
+    """
+    Change le mot de passe dans la base de données SQL
+    """
+    connection = sqlite3.connect(CHEMIN_BASE)
+
+    request = "INSERT INTO identification (nom, prenom, mail, login, motPasse, statut, newMdp) VALUES ('{}','{}','{}','{}','{}',{},{});".format(nom,prenom,mail,login,motPasse,statut,newmdp)
+
+    connection.execute(request)
+    connection.commit()
+    connection.close()
+    
+def updateMembreData(champ, idUser,newvalue):
+    connection = sqlite3.connect(CHEMIN_BASE)
+
+    request = "UPDATE identification SET "+champ+"='"+newvalue+"' WHERE idUser = "+idUser+";"
+
+    connection.execute(request)
+    connection.commit()
+    connection.close()

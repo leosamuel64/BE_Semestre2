@@ -1,34 +1,68 @@
 from flask import Flask, render_template, redirect, session, request
 from .model import bdd
+from . import fonctions
+from flask_mail import Mail, Message
+
+
 
 app=Flask(__name__)
 app.template_folder = "template"
 app.static_folder="static"
 app.config.from_object('myApp.config')
+email = Mail(app)
+
+app.config['MAIL_SERVER']='smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 2525
+app.config['MAIL_USERNAME'] = 'cea3170a21d1f1'
+app.config['MAIL_PASSWORD'] = 'baa685dcdf4b56'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 
 @app.route('/')
 def index():
-    return render_template("index.html", titre='Home')
+    if 'newMdp' in session and session['newMdp']=='1':
+        return redirect('/newMdp.html')
+    else:
+        return render_template("index.html", titre='Home')
 
 @app.route('/prevision.html')
 def prevision():
-    return render_template("prevision.html", titre='Prévisions')
+    if 'newMdp' in session and session['newMdp']=='1':
+        return redirect('/newMdp.html')
+    else:
+        return render_template("prevision.html", titre='Prévisions')
 
 @app.route('/administration.html')
 def administration():
-    return render_template("administration.html", titre='Administration')
+    if 'newMdp' in session and session['newMdp']=='1':
+        return redirect('/newMdp.html')
+    else:
+        return render_template("administration.html", titre='Administration')
 
 @app.route('/compte.html')
 def compte():
-    return render_template("compte.html", titre='Compte')
+    if 'newMdp' in session and session['newMdp']=='1':
+        return redirect('/newMdp.html')
+    else:
+        return render_template("compte.html", titre='Compte')
 
 @app.route('/login.html')
 def login():
-    return render_template("login.html", titre='Authentification')
+    if 'newMdp' in session and session['newMdp']=='1':
+        return redirect('/newMdp.html')
+    else:
+        return render_template("login.html", titre='Authentification')
 
 @app.route('/webmaster.html')
 def webmaster():
-    return render_template("webmaster.html", titre='WebMasters')
+    if 'newMdp' in session and session['newMdp']=='1':
+        return redirect('/newMdp.html')
+    else:
+        return render_template("webmaster.html", titre='WebMasters')
+
+@app.route('/newMdp.html')
+def nouveauMdp():
+    return render_template("newMdp.html", titre='nouveau mot de passe')
 
 
 # -------------------------------------------------------------------------------------
@@ -37,7 +71,6 @@ def webmaster():
 
 @app.route('/verif_login', methods=["POST"])
 def verif_mdp():
-    print(request.form)
     login=request.form["login"]
     mdp=request.form["mdp"]
     res = bdd.verifAuthData(login,mdp)
@@ -61,6 +94,44 @@ def verif_mdp():
             
 @app.route('/logout')
 def logout():
-    session['connected']=False
+    session.clear()
     return redirect('/')
             
+@app.route('/ajouteCompte', methods=["POST"])
+def ajouteCompte():
+    nom=request.form["nom"]
+    prenom=request.form["prenom"]
+    mail=request.form["mail"]
+    login=request.form["login"]
+    statut=request.form["statut"] 
+    mdp=fonctions.randomPassword()
+    bdd.add_membreData(nom,
+                       prenom,
+                       mail,
+                       login,
+                       fonctions.hashMdp(mdp),
+                       statut)
+    session['newMdp']=mdp
+    # msg=Message('Creation de compte',
+    #             sender='yomale9967@cosaxu.com',
+    #             recipients=[mail])
+    # msg.body='Votre login est : {} \n\n Votre mot de passe est: {}'.format(login,mdp)
+    # email.send(msg)
+    
+    return redirect('/compte.html')
+
+@app.route('/newMdp', methods=["POST"])
+def changeMdp():
+    mdp1=request.form["mdp1"]
+    mdp2=request.form["mdp2"]
+    
+    if mdp1==mdp2:
+        bdd.updateMembreData('motPasse',str(session['idUser']),str(fonctions.hashMdp(mdp1)))
+        bdd.updateMembreData('newMdp',str(session['idUser']),'0')
+        session['newMdp']=0
+        return redirect('/')
+    else:
+        return redirect('/newMdp.html')
+    
+    
+    
